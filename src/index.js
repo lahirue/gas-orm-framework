@@ -1,7 +1,7 @@
 import Resources from './scripts/resources';
 
-function testDBoperation() {
+function doGet() {
   Resources.sampleExecution();
 }
 
-global.testDBoperation = testDBoperation;
+global.doGet = doGet;

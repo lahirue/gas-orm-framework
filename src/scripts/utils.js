@@ -1,4 +1,4 @@
-const ERROR_EMAIL = 'youremail@sci.pdn.ac.lk';
+const ERROR_EMAIL = 'prod.apps.notifications@sci.pdn.ac.lk';
 const TIME_ZONE = 'Asia/Colombo';
 const DATE_FORMAT = 'MM/dd/yyyy HH:mm:ss';
 const UUID_FORMAT = 'MMddyyyyHHmmss';
@@ -72,6 +72,43 @@ class Utils {
 
   static getAppName() {
     return APP_NAME;
+  }
+
+  static getSheetStructure() {
+    return {
+      range: 'A:M',
+      count: '13',
+      columns: {
+        A: 'ID',
+        B: 'NIC',
+        C: 'RegNo',
+        D: 'Incno',
+        E: 'AppYear',
+        F: 'Faculty',
+        G: 'Course',
+        H: 'Status',
+        I: 'Idrequried',
+        J: 'Idprinted',
+        K: 'User',
+        L: 'Crdate',
+        M: 'Crtime'
+      },
+      arrayNames: [
+        'ID',
+        'NIC',
+        'RegNo',
+        'Incno',
+        'AppYear',
+        'Faculty',
+        'Course',
+        'Status',
+        'Idrequried',
+        'Idprinted',
+        'User',
+        'Crdate',
+        'Crtime'
+      ]
+    };
   }
 
   static errHandler(e, strFunc) {

@@ -123,6 +123,42 @@ class DatabaseOperations {
     }
   }
 
+  static deleteThreadSafe(oldObject) {
+    let retVal = 0;
+    try {
+      const spArray = [];
+      if (oldObject) {
+        Object.entries(oldObject).forEach(([, value]) => {
+          spArray.push(`${value}_DELETED`);
+        });
+      }
+      const oldArray = [];
+      if (oldObject) {
+        Object.entries(oldObject).forEach(([, value]) => {
+          oldArray.push(value);
+        });
+      }
+      if (spArray.length > 0) {
+        const foundRow = this.findObjectRow(oldArray);
+        const outerArray = [];
+        outerArray.push(spArray);
+        this.connectedDatabse.getRange(foundRow + 1, 1, 1, spArray.length).setValues(outerArray);
+        if (this.cacheEnabled) {
+          CacheService.getScriptCache().remove(this.CACHE_KEY);
+        }
+        retVal = 1;
+      } else {
+        console.error(`No data inside array for deleting`);
+        throw new Error(`Error ocuured while deleting data as an array`);
+      }
+
+      return retVal;
+    } catch (e) {
+      console.error(`Error ocuured while deleting  a request in DBOperations${e.lineNumber}`, e);
+      throw new Error(`Error ocuured while deleting in DBOperations${e}`);
+    }
+  }
+
   static findObjectRow(oldObject) {
     const allData = this.readDatabaseCache();
     let foundItem = -1;
@@ -210,6 +246,69 @@ class DatabaseOperations {
       }
     }
     return this.dataArray.length > 1 ? this.dataArray : this.dataArray[0];
+  }
+
+  static buildGoogleQuery(query) {
+    const metaInfo = Utils.getSheetStructure().columns;
+    let newQuery = query;
+    Object.entries(metaInfo).forEach(([key, value]) => {
+      newQuery = this.replaceAll(newQuery, value, key);
+    });
+    return newQuery;
+  }
+
+  static replaceAll(text, search, replacement) {
+    return text.replace(new RegExp(search, 'g'), replacement);
+  }
+
+  static googleQuery(query) {
+    const generatedQuery = this.buildGoogleQuery(query);
+    console.log(`generatedQuery : ${generatedQuery}`);
+    this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
+  }
+
+  /**
+   * Use this method only for large set of data, more than 20,000 records approximately
+   * @param {*} query is the Google Query Language synatx you must pass
+   */
+  static sendGoogleQuery(query) {
+    try {
+      const metaInfo = Utils.getSheetStructure();
+      const qvizURL = `https://docs.google.com/spreadsheets/d/${this.DBID}/gviz/tq?tqx=out:json&headers=1&sheet=${
+        this.sheetName
+      }&range=${metaInfo.range}&tq=${encodeURIComponent(query)}`;
+      const ret = UrlFetchApp.fetch(qvizURL, {
+        headers: { Authorization: `Bearer ${ScriptApp.getOAuthToken()}` }
+      }).getContentText();
+      return JSON.parse(
+        ret
+          .replace('/*O_o*/', '')
+          .replace('google.visualization.Query.setResponse(', '')
+          .slice(0, -2)
+      );
+    } catch (e) {
+      console.error('Error occured while sending URL Fetch request to Google Sheet API. ', e);
+      throw new Error(`Error occured while sending URL Fetch request to Google Sheet API.${e}`);
+    }
+  }
+
+  static pareGoogleQuery(jsonObject) {
+    const { rows } = jsonObject.table;
+    const { arrayNames } = Utils.getSheetStructure();
+    const objectArray = [];
+    rows.forEach(function(item) {
+      const newObject = {};
+      let i = 0;
+      item.c.forEach(function(innerItem) {
+        if (innerItem && innerItem.v) {
+          newObject[arrayNames[i]] = innerItem.v;
+        }
+        i += 1;
+      });
+
+      objectArray.push(newObject);
+    });
+    console.log(`ret data : ${JSON.stringify(objectArray)}`);
   }
 
   static cloneObject(object) {
