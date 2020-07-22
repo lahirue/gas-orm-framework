@@ -8,8 +8,12 @@ class Resources {
     // const foundObj = DatabaseOperations.queryDatabase('NIC === "966470100V"');
     // const foundObj = DatabaseOperations.queryDatabase('KEY:NIC === "92165445V" && KEY:RegNo === "S/10/586"');
     // refer more details for this query |  https://developers.google.com/chart/interactive/docs/querylanguage
-    DatabaseOperations.googleQuery("SELECT ID , NIC , RegNo WHERE NIC = '92165444V'");
-    //DatabaseOperations.googleQuery("SELECT * WHERE NIC = '92165444V'");
+    // DatabaseOperations.googleQuery("SELECT ID , NIC , RegNo WHERE NIC = '92165444V'");
+    const data = DatabaseOperations.googleQuery("SELECT * WHERE Faculty = '44'");
+    console.log(`ret data res :${JSON.stringify(data)}`);
+    data[0].Course = '1999';
+    data[1].Course = '1999';
+    DatabaseOperations.batchUpdate(data);
     //
     // queryDatabaseUpdated
     // const newObject = DatabaseOperations.cloneObject(foundObj);

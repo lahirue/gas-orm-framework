@@ -1,7 +1,8 @@
 {
     "timeZone": "Asia/Colombo",
     "dependencies": {
-        "enabledAdvancedServices": [{
+        "enabledAdvancedServices": [
+            {
                 "userSymbol": "Gmail",
                 "serviceId": "gmail",
                 "version": "v1"
@@ -15,9 +16,15 @@
                 "userSymbol": "AdminDirectory",
                 "serviceId": "admin",
                 "version": "directory_v1"
+            },
+            {
+                "userSymbol": "Sheets",
+                "serviceId": "sheets",
+                "version": "v4"
             }
         ],
-        "libraries": [{
+        "libraries": [
+            {
                 "userSymbol": "OAuth1",
                 "libraryId": "1CXDCY5sqT9ph64fFwSzVtXnbjpSfWdRymafDrtIZ7Z_hwysTY7IIhi7s",
                 "version": "16"

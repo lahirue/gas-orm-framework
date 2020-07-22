@@ -264,7 +264,7 @@ class DatabaseOperations {
   static googleQuery(query) {
     const generatedQuery = this.buildGoogleQuery(query);
     console.log(`generatedQuery : ${generatedQuery}`);
-    this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
+    return this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
   }
 
   /**
@@ -308,7 +308,42 @@ class DatabaseOperations {
 
       objectArray.push(newObject);
     });
-    console.log(`ret data : ${JSON.stringify(objectArray)}`);
+    return objectArray;
+  }
+
+  static batchUpdate(objectArray) {
+    const metaInfo = Utils.getSheetStructure();
+    const generatedArray = [];
+    const rangeValues = metaInfo.range.split(':');
+    let generatedRange = '';
+    const { sheetName } = this;
+    objectArray.forEach(function(item) {
+      generatedRange = `${sheetName}!${rangeValues[0]}${item.ID}:${rangeValues[1]}${item.ID}`;
+      const newObject = {};
+      newObject.range = generatedRange;
+      newObject.majorDimension = 'ROWS';
+      const dataArray = [];
+      metaInfo.arrayNames.forEach(function(keyItem, i) {
+        // if (item[keyItem]) {
+        if (i === 0) {
+          dataArray.push('=ROW()');
+        } else {
+          dataArray.push(item[keyItem]);
+        }
+      });
+
+      newObject.values = [dataArray];
+      generatedArray.push(newObject);
+      // generatedArray
+    });
+    console.log(`printing before update : ${JSON.stringify(generatedArray)}`);
+    const request = {
+      valueInputOption: 'USER_ENTERED',
+      data: generatedArray
+    };
+
+    const response = Sheets.Spreadsheets.Values.batchUpdate(request, this.DBID);
+    console.log(`BATCH : ${JSON.stringify(response)}`);
   }
 
   static cloneObject(object) {
