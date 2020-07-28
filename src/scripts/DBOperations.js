@@ -94,6 +94,34 @@ class DatabaseOperations {
     }
   }
 
+  static updateDirect(object) {
+    const retVal = '';
+    try {
+      const spArray = [];
+      if (object) {
+        Object.entries(object).forEach(([, value]) => {
+          spArray.push(value);
+        });
+      }
+      if (spArray.length > 0) {
+        const outerArray = [];
+        outerArray.push(spArray);
+        this.connectedDatabse.getRange(object.ID + 1, 1, 1, spArray.length).setValues(outerArray);
+        if (this.cacheEnabled) {
+          CacheService.getScriptCache().remove(this.CACHE_KEY);
+        }
+      } else {
+        console.error(`No data inside array for updating`);
+        throw new Error(`Error ocuured while updating data as an array`);
+      }
+
+      return retVal;
+    } catch (e) {
+      console.error(`Error ocuured while updateDirect new Request in DBOperations${e.lineNumber}`, e);
+      throw new Error(`Error ocuured while updateDirect in DBOperations${e}`);
+    }
+  }
+
   static deleteItem(oldObject) {
     let retVal = 0;
     try {
@@ -263,8 +291,11 @@ class DatabaseOperations {
 
   static googleQuery(query) {
     const generatedQuery = this.buildGoogleQuery(query);
-    console.log(`generatedQuery : ${generatedQuery}`);
-    return this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
+    const foundObj = this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
+    if (foundObj && foundObj.length > 0 && foundObj.length === 1) {
+      return foundObj[0];
+    }
+    return foundObj;
   }
 
   /**

@@ -25,6 +25,11 @@
         ],
         "libraries": [
             {
+                "userSymbol": "QUnit",
+                "libraryId": "13agWuzcPH32W4JJvOqOEYqeNHGihS63P2V-a-Vxz-c9WPIzZYBvIhs3m",
+                "version": "4"
+            },
+            {
                 "userSymbol": "OAuth1",
                 "libraryId": "1CXDCY5sqT9ph64fFwSzVtXnbjpSfWdRymafDrtIZ7Z_hwysTY7IIhi7s",
                 "version": "16"
