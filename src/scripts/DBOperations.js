@@ -273,7 +273,7 @@ class DatabaseOperations {
         }
       }
     }
-    return this.dataArray.length > 1 ? this.dataArray : this.dataArray[0];
+    return this.dataArray;
   }
 
   static buildGoogleQuery(query) {
@@ -292,9 +292,6 @@ class DatabaseOperations {
   static googleQuery(query) {
     const generatedQuery = this.buildGoogleQuery(query);
     const foundObj = this.pareGoogleQuery(this.sendGoogleQuery(generatedQuery));
-    if (foundObj && foundObj.length > 0 && foundObj.length === 1) {
-      return foundObj[0];
-    }
     return foundObj;
   }
 

@@ -37,7 +37,7 @@ class Resources {
       DatabaseOperations.initilizeDatabase('1uM-QIUoCSRJcrhx3THBmDajxUbaxiOdMRYpiBoill-Q');
       DatabaseOperations.openDatabaseConnection('mytable');
       const foundObj = DatabaseOperations.queryDatabase('KEY:NIC === "800348997V"');
-      if (foundObj.NIC === '800348997V') {
+      if (foundObj && foundObj[0].NIC === '800348997V') {
         return true;
       }
       return false;
